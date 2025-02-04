@@ -1,45 +1,50 @@
-// Importeer het npm package Express (uit de door npm aangemaakte node_modules map)
-// Deze package is geïnstalleerd via `npm install`, en staat als 'dependency' in package.json
+// Importeert het express pakket, het helpt bij het opzetten van een webserver en het beheren van routes.
+// Express is geinstalleerd via npm, en staat vermeld als dependency in package.json
 import express from 'express'
 
-// Importeer de Liquid package (ook als dependency via npm geïnstalleerd)
+// Importeert de liquid templating engine, die je kunt gebruiken om dynamische HTML te maken
+// Hierdoor kun je HTML bestanden renderen met daarin variabelen die tijdens runtime worden ingevuld met data.
 import { Liquid } from 'liquidjs';
 
+// Hier definieer je een variabele met een person ID, die je later gebruikt om data op te halen
+// Deze parameter geeft aan dat je data wilt ophalen van een specifieke persoon, in dit geval mijn ID; 80
+const personID = 80
 
-// Vul hier jouw eigen ID in (zie de instructies in de leertaak)
-const personID = 234
-
-// Doe een fetch naar een URL op de WHOIS API, ga pas verder als de fetch gelukt is
+// Haalt data op van de directus API, met behulp van de fetch API
+// De Fetch fuctie verstuurt een HTTP GET req naar de opgegveen URL
+// De basis URL wordt gecomineerd met de person ID, om mijn specifieke data op te halen
+// De data wordt opgeslagen in de variabele personResponse
 const personResponse = await fetch('https://fdnd.directus.app/items/person/' + personID)
 
-// Lees van de response van die fetch het JSON object in, waar we iets mee kunnen doen
+// De opgehaalde data wordt omgezet naar JSON formaat, zodat het makkelijker te gebruiken is
+// Await zorgt ervoor dat de code wacht totdat de data is opgehaald, voordat het verder gaat
+// De JSON data wordt opgeslagen in de variabele personResponseJSON
 const personResponseJSON = await personResponse.json()
 
-// Controleer eventueel de data in je console
-// (Let op: dit is _niet_ de console van je browser, maar van NodeJS, in je terminal)
-// console.log(personResponseJSON)
-
-
-// Maak een nieuwe Express applicatie aan, waarin we de server configureren
+// Maakt een nieuwe Express applicatie aan, waarin we de server configureren
+// Dit is de basis van de server, waarin routes worden gedefinieerd en HTTP req worden afgehandeld
 const app = express()
 
-// Gebruik de map 'public' voor statische bestanden (resources zoals CSS, JavaScript, afbeeldingen en fonts)
+// Gebruik de map 'public' voor statische bestanden (zoals CSS, JavaScript, afbeeldingen en fonts)
 // Bestanden in deze map kunnen dus door de browser gebruikt worden
 app.use(express.static('public'))
 
-// Stel Liquid in als 'view engine'
+// Stelt Liquid in als view engine,
+// Dit zorgt ervoor dat Express weet dat we Liquid gebruiken voor het renderen van HTML
 const engine = new Liquid();
 app.engine('liquid', engine.express()); 
 
-// Stel de map met Liquid templates in
+// Stelt de map met Liquid templates in
 // Let op: de browser kan deze bestanden niet rechtstreeks laden (zoals voorheen met HTML bestanden)
+// De server zal de templates renderen en de HTML naar de browser sturen
 app.set('views', './views')
 
-// Om Views weer te geven, heb je Routes nodig
-// Maak een GET route voor de index (meestal doe je dit in de root, als /)
-// In je visitekaartje was dit waarschijnlijk index.html
+// Definieert een GET route voor de root ("/") van de website
+//Dit betekent dat wanneer iemand naar de homepage gaat, deze route wordt uitgevoerd
 app.get('/', async function (request, response) {
-   // Render index.liquid uit de Views map en geef de opgehaalde data mee, in een variabele genaamd person
+    // personResponseJSON.data bevat de opgehaalde data van de API
+    // Dit wordt doorgegeven aan de template, zodat het kan worden weergegeven in de HTML
+    // De template kan vervolgens de variabele person gebruiken om dynamische inhoud te tonen
    response.render('index.liquid', {person: personResponseJSON.data})
 })
 
