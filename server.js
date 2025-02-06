@@ -21,6 +21,8 @@ const personResponse = await fetch('https://fdnd.directus.app/items/person/' + p
 // De JSON data wordt opgeslagen in de variabele personResponseJSON
 const personResponseJSON = await personResponse.json()
 
+personResponseJSON.data.custom = JSON.parse(personResponseJSON.data.custom);
+
 // Maakt een nieuwe Express applicatie aan, waarin we de server configureren
 // Dit is de basis van de server, waarin routes worden gedefinieerd en HTTP req worden afgehandeld
 const app = express()
@@ -41,12 +43,20 @@ app.set('views', './views')
 
 // Definieert een GET route voor de root ("/") van de website
 //Dit betekent dat wanneer iemand naar de homepage gaat, deze route wordt uitgevoerd
-app.get('/', async function (request, response) {
+app.get('/oefenen', async function (request, response) {
     // personResponseJSON.data bevat de opgehaalde data van de API
     // Dit wordt doorgegeven aan de template, zodat het kan worden weergegeven in de HTML
     // De template kan vervolgens de variabele person gebruiken om dynamische inhoud te tonen
-   response.render('index.liquid', {person: personResponseJSON.data})
+   response.render('oefenen.liquid', {person: personResponseJSON.data})
 })
+
+app.get('/', async function (request, response) {
+  // personResponseJSON.data bevat de opgehaalde data van de API
+  // Dit wordt doorgegeven aan de template, zodat het kan worden weergegeven in de HTML
+  // De template kan vervolgens de variabele person gebruiken om dynamische inhoud te tonen
+ response.render('index.liquid', {person: personResponseJSON.data})
+})
+
 
 // Had je meer pagina's in je oude visitekaartje? Zoals een contact.html?
 // Maak daar dan meer Routes voor aan, en koppel ze aan Views
